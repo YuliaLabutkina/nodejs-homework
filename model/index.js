@@ -1,30 +1,9 @@
-const fsPromises = require('fs').promises
-const path = require('path')
+const Contact = require('./schemas/contact')
 
-const contactsPath = path.join(__dirname, './contacts.json')
-
-async function readFiles(patch) {
+async function getContacts() {
   try {
-    const file = await fsPromises.readFile(patch, 'utf-8')
-    const list = JSON.parse(file)
-    return list
-  } catch (err) {
-    console.log(err)
-  }
-}
-
-async function writeFiles(patch, data) {
-  try {
-    await fsPromises.writeFile(patch, JSON.stringify(data), 'utf-8')
-  } catch (err) {
-    console.log(err)
-  }
-}
-
-async function listContacts() {
-  try {
-    const contacts = await readFiles(contactsPath)
-    return contacts
+    const result = await Contact.find({})
+    return result
   } catch (err) {
     console.log(err)
   }
@@ -32,8 +11,8 @@ async function listContacts() {
 
 async function getContactById(contactId) {
   try {
-    const contacts = await readFiles(contactsPath)
-    return contacts.filter(el => el.id === Number(contactId))
+    const result = await Contact.find({ _id: contactId})
+    return result
   } catch (err) {
     console.log(err)
   }
@@ -41,24 +20,17 @@ async function getContactById(contactId) {
 
 async function removeContact(contactId) {
   try {
-    const contacts = await readFiles(contactsPath)
-    const data = contacts.filter(el => el.id !== Number(contactId))
-    console.log(contactId)
-    if (data.length !== contacts.length) {
-      await writeFiles(contactsPath, data)
-      return true
-    }
-    return false
+    const result = await Contact.findByIdAndRemove(contactId)
+    return result
   } catch (err) {
     console.log(err)
   }
 }
 
-async function addContact(name, email, phone) {
+async function addContact(body) {
   try {
-    const contacts = await readFiles(contactsPath)
-    const data = [...contacts, { id: contacts[contacts.length - 1].id + 1, name, email, phone }]
-    await writeFiles(contactsPath, data)
+    const result = await Contact.create(body)
+    return result
   } catch (err) {
     console.log(err)
   }
@@ -66,21 +38,19 @@ async function addContact(name, email, phone) {
 
 async function updateContact(contactId, body) {
   try {
-    const contacts = await readFiles(contactsPath)
-    const data = contacts.map(el => el.id === Number(contactId) ? { ...el, ...body } : el)
-    const updateOneContact = data.find(el => el.id === Number(contactId))
-    if (updateOneContact) {
-      await writeFiles(contactsPath, data)
-      return updateOneContact
-    }
-    return false
+    const result = await Contact.findByIdAndUpdate(
+      { _id: contactId },
+      { ...body },
+      {new: true},
+    )
+    return result
   } catch (err) {
     console.log(err)
   }
 }
 
 module.exports = {
-  listContacts,
+  getContacts,
   getContactById,
   removeContact,
   addContact,
