@@ -11,7 +11,7 @@ const schemaUpdateContact = Joi.object({
   name: Joi.string().alphanum().min(2).max(30).optional(),
   email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'gmail'] } }).optional(),
   phone: Joi.string().min(9).max(17).optional(),
-})
+}).min(1)
 
 const validate = (schema, obj, next) => {
   const { error } = schema.validate(obj)
