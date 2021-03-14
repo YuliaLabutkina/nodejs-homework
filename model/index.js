@@ -38,7 +38,7 @@ async function addContact(body) {
 
 async function updateContact(contactId, body) {
   try {
-    const result = await Contact.findByIdAndUpdate(
+    const result = await Contact.findOneAndUpdate(
       { _id: contactId },
       { ...body },
       {new: true},
