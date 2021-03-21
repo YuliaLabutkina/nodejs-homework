@@ -1,13 +1,14 @@
-const { getContacts, getContactById, removeContact, addContact, updateContact } = require('../model')
+const { getContacts, getContactById, removeContact, addContact, updateContact } = require('../model/contacts')
 
 const getAllContacts = async (req, res, next) => {
   try {
-    const allContacts = await getContacts()
+    const userId = req.user.id
+    const allContacts = await getContacts(userId, req.query)
     return res.json({
       status: 'success',
       code: 200,
       data: {
-        allContacts
+        ...allContacts
       },
     })
   } catch (err) {
@@ -17,7 +18,8 @@ const getAllContacts = async (req, res, next) => {
 
 const getOneContactById = async (req, res, next) => {
   try {
-    const contact = await getContactById(req.params.contactId)
+    const userId = req.user.id
+    const contact = await getContactById(req.params.contactId, userId)
     if (contact) {
       return res.json({
         status: 'success',
@@ -40,8 +42,9 @@ const getOneContactById = async (req, res, next) => {
 
 const createNewContact = async (req, res, next) => {
   try {
+    const userId = req.user.id
     const {name, email, phone } = req.body
-    await addContact(req.body)
+    await addContact({ ...req.body, owner: userId})
     res.status(201).json({
       status: 'success',
       code: 201,
@@ -58,7 +61,8 @@ const createNewContact = async (req, res, next) => {
 
 const deleteContact = async (req, res, next) => {
   try {
-    const id = await removeContact(req.params.contactId)
+    const userId = req.user.id
+    const id = await removeContact(req.params.contactId, userId)
     if (id) {
       res.status(200).json({
         status: 'success',
@@ -79,8 +83,9 @@ const deleteContact = async (req, res, next) => {
 
 const updateOneContact = async (req, res, next) => {
   try {
+    const userId = req.user.id
     if (req.body) {
-      const contact = await updateContact(req.params.contactId, req.body)
+      const contact = await updateContact(req.params.contactId, req.body, userId)
       if (contact) {
         res.status(200).json({
           status: 'success',
