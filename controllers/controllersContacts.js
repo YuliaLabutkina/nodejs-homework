@@ -44,14 +44,15 @@ const createNewContact = async (req, res, next) => {
   try {
     const userId = req.user.id
     const {name, email, phone } = req.body
-    await addContact({ ...req.body, owner: userId})
+    const { _id } = await addContact({ ...req.body, owner: userId})
     res.status(201).json({
       status: 'success',
       code: 201,
       data: {
         name,
         email,
-        phone
+        phone,
+        _id
       },
     })
   } catch (err) {
