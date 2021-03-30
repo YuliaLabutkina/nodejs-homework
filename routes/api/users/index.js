@@ -15,4 +15,6 @@ router.get('/current', checkToken, userController.getUserInfo)
 router.patch('/', checkToken, userController.updateSubscription)
 router.patch('/avatars', guard, upload.single('avatar'), validateUploadAvatar, userController.avatars)
 
+router.get('/verify/:token', userController.verify)
+
 module.exports = router
